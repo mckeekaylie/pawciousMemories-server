@@ -47,7 +47,7 @@ router.post('/signin', (req, res) => {
                         sessionToken: token
                     })
                 } else {
-                    res.status(502).send({error: 'bad gateway'})
+                    res.status(502).send({error: 'bad gateway'})    
                 }
             })
         } else {
