@@ -12,7 +12,7 @@ const bucketListBand = require('./controllers/bucketlistcontroller');
 
 //db import & sync
 const sequelize = require('./db');
-sequelize.sync({force: true});
+sequelize.sync();
 app.use(express.json());
 
 //middleware
