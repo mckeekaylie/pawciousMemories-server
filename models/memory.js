@@ -1,18 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
-    const Log = sequelize.define('log', {
-        date: {
-            type: DataTypes.DATEONLY,
-            allowNull: false
-        },
-        title: {
+    const Memory = sequelize.define('memory', {
+        memory: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        bands: {
-            type: DataTypes.ARRAY(DataTypes.STRING),
-            allowNull: false
-        },
-        venue: {
+        dog: {
             type: DataTypes.STRING,
             allowNull: false
         },
@@ -21,6 +13,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         }
     })
-    return Log;
+    return Memory;
 }
 

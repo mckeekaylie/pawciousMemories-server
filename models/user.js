@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        role: {
+            type: DataTypes.ENUM,
+            values: ['user', 'admin', 'disabled']
         }
     })
     return User;
