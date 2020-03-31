@@ -9,23 +9,21 @@ const upload = multer({ dest: '/tmp/'});
 
 // post an image
 router.post('/image', upload.single('file'), (req, res) => {
-    const file = global.appRoot + '/uploads/' + req.file.filename;
-    fs.rename(req.file.path, file, function(err) {
-        if (err) {
-            console.log(err);
-            res.send(500);
-        } else {
-            db.Category.create({
-                name: req.body.name,
-                description: req.body.description,
-                poster: req.file.filename
-            })
-            .then(r => {
-                res.send(r.get({plain: true}));
-            });
-        }
-    })
-})
+    let file = req.file;
+
+    const imgFromReq = {
+        file: file.path,
+        title: req.body.title,
+        caption: req.body.caption,
+        owner: req.user.id
+    }
+
+    GalleryModel.create(imgFromReq) 
+        .then(img => res.status(200).json(img))
+        .catch(err => res.json({
+            error: err
+        }))
+  })
 
 // delete an iamge
 router.delete('/image/:id', (req, res) => {

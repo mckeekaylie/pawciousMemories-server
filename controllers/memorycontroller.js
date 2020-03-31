@@ -6,8 +6,8 @@ const MemModel = require('../db').import('../models/memory.js')
 router.post('/memory', (req, res) => {
     const memFromRequest = {
         memory: req.body.memory,
-        dog: req.body.dog,
-        owner: req.body.owner
+        pet: req.body.pet,
+        owner: req.user.id
     }
 
     MemModel.create(memFromRequest)

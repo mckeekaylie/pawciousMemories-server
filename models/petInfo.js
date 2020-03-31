@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         },
         adoptOrFoster: {
             type: DataTypes.STRING
+        },
+        owner: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     })
     return Info;

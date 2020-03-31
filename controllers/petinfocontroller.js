@@ -10,7 +10,8 @@ router.post('/pet', (req, res) => {
         breed: req.body.breed,
         dob: req.body.dob,
         dateOfAdoption: req.body.dateOfAdoption,
-        adoptOrFoster: req.body.adoptOrFoster
+        adoptOrFoster: req.body.adoptOrFoster,
+        owner: req.user.id
     }
 
     InfoModel.create(infoFromRequest)
