@@ -6,7 +6,7 @@ const multer = require('multer');
 // CHANGE FILENAME
 const storage = multer.diskStorage({
     filename: function(req, file, cb) {
-        cb(null, new Date().toISOString() + file.originalname);
+        cb(null, file.originalname);
     }
 });
 
@@ -75,32 +75,21 @@ router.delete('/memory/:id', (req, res) => {
 });
 
 // UPDATE A MEMORY
-router.put('/memory/:id', (req, res) => {
-    if(req.file){
-        MemModel.update(req.file, {
-            where: {
-                id: req.params.id
-            }
-        })
-        .then(mem => res.status(200).json(mem))
-        .catch(err => res.json(err))
-
-        MemModel.update(req.body, {
-            where: {
-                id: req.params.id
-            }
-        })
-        .then(mem => res.status(200).json(mem))
-        .catch(err => res.json(err))
-    } else {
-        MemModel.update(req.body, {
-            where: {
-                id: req.params.id
-            }
-        })
-        .then(mem => res.status(200).json(mem))
-        .catch(err => res.json(err))
+router.put('/memory/:id', upload.single('file'), (req, res) => {
+    const updateReq = {
+        file: req.file.path,
+        memory: req.body.memory,
+        pet: req.body.pet,
+        owner: req.user.id
     }
+
+    MemModel.update(updateReq, {
+        where: {
+            id: req.params.id
+        }
+    })
+    .then(mem => res.status(200).json(mem))
+    .catch(err => res.json(err))
 })
 
 // GET A MEMORY BY ID

@@ -29,7 +29,7 @@ const upload = multer({
 });
 
 
-// post pet info
+// POST PET INFO
 router.post('/pet', upload.single('file'), (req, res) => {
     const infoFromRequest = {
         file: req.file.path,
@@ -49,18 +49,29 @@ router.post('/pet', upload.single('file'), (req, res) => {
         }))
 })
  
-// update pet info
-router.put('/pet/:id', (req, res) => {
-    InfoModel.update(req.body, {
+// UPDATE PET INFO
+router.put('/pet/:id', upload.single('file'), (req, res) => {
+    const updateReq = {
+        file: req.file.path,
+        name: req.body.name,
+        species: req.body.species,
+        breed: req.body.breed,
+        dob: req.body.dob,
+        dateOfAdoption: req.body.dateOfAdoption,
+        adoptOrFoster: req.body.adoptOrFoster,
+        owner: req.user.id
+    }
+
+    InfoModel.update(updateReq, {
         where: {
             id: req.params.id
         }
     })
-        .then(info => res.status(200).json(info))
-        .catch(err => res.json(err))
+    .then(mem => res.status(200).json(mem))
+    .catch(err => res.json(err))
 })
 
-// get a pet's info
+// GET A PET'S INFO
 router.get('/pet/:id', (req, res) => {
     InfoModel.findOne({
         where: {
@@ -73,7 +84,7 @@ router.get('/pet/:id', (req, res) => {
     }))
 })
 
-//get all pets for an individual user
+// GET ALL PETS FOR AN INDIVIDUAL USER
 router.get('/pet', (req, res) => {
     InfoModel.findAll({
         where: { owner: req.user.id }
