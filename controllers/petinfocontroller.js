@@ -1,10 +1,38 @@
 const express = require('express');
 const router = express.Router();
 const InfoModel = require('../db').import('../models/petinfo.js');
+const multer = require('multer');
+
+// CHANGE FILENAME
+const storage = multer.diskStorage({
+    filename: function(req, file, cb) {
+        cb(null, new Date().toISOString() + file.originalname);
+    }
+});
+
+// NOT ALLOW FILES THAT AREN'T JPEG OR PNG
+const fileFilter = (req, file, cb) => {
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+
+const upload = multer({ 
+    storage: storage,
+    dest: '/tmp/', //SET FOLDER DESTINATION
+    limits: { // SET FILE SIZE LIMIT
+        fileSize: 1024 * 1024 * 6
+    },
+    fileFilter: fileFilter //CALL FILE FILTER
+});
+
 
 // post pet info
-router.post('/pet', (req, res) => {
+router.post('/pet', upload.single('file'), (req, res) => {
     const infoFromRequest = {
+        file: req.file.path,
         name: req.body.name,
         species: req.body.species,
         breed: req.body.breed,
@@ -20,7 +48,7 @@ router.post('/pet', (req, res) => {
             error: err
         }))
 })
-
+ 
 // update pet info
 router.put('/pet/:id', (req, res) => {
     InfoModel.update(req.body, {

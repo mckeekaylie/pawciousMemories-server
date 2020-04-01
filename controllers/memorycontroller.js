@@ -1,23 +1,67 @@
 const express = require('express');
 const router = express.Router();
 const MemModel = require('../db').import('../models/memory.js')
+const multer = require('multer');
 
-// post a memory
-router.post('/memory', (req, res) => {
-    const memFromRequest = {
-        memory: req.body.memory,
-        pet: req.body.pet,
-        owner: req.user.id
+// CHANGE FILENAME
+const storage = multer.diskStorage({
+    filename: function(req, file, cb) {
+        cb(null, new Date().toISOString() + file.originalname);
     }
+});
 
-    MemModel.create(memFromRequest)
-        .then(mem => res.status(200).json(mem))
+// NOT ALLOW FILES THAT AREN'T JPEG OR PNG
+const fileFilter = (req, file, cb) => {
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+
+const upload = multer({ 
+    storage: storage,
+    dest: '/tmp/', //SET FOLDER DESTINATION
+    limits: { // SET FILE SIZE LIMIT
+        fileSize: 1024 * 1024 * 6
+    },
+    fileFilter: fileFilter //CALL FILE FILTER
+});
+
+// POST A MEMORY
+router.post('/memory', upload.single('file'), (req, res) => {
+    if(req.file) {
+        let file = req.file;
+
+        const memFromReq = {
+            file: file.path,
+            memory: req.body.memory,
+            pet: req.body.pet,
+            owner: req.user.id
+        }
+
+        MemModel.create(memFromReq) 
+        .then(img => res.status(200).json(img))
         .catch(err => res.json({
             error: err
         }))
-})
 
-// delete a memory
+    } else {
+        const memFromReq = {
+            memory: req.body.memory,
+            pet: req.body.pet,
+            owner: req.user.id
+        }
+        
+        MemModel.create(memFromReq) 
+            .then(img => res.status(200).json(img))
+            .catch(err => res.json({
+                error: err
+            }))
+    }
+  })
+
+// DELETE A MEMORY
 router.delete('/memory/:id', (req, res) => {
     MemModel.destroy({
         where: {
@@ -30,18 +74,36 @@ router.delete('/memory/:id', (req, res) => {
     }))
 });
 
-// update a memory
+// UPDATE A MEMORY
 router.put('/memory/:id', (req, res) => {
-    MemModel.update(req.body, {
-        where: {
-            id: req.params.id
-        }
-    })
+    if(req.file){
+        MemModel.update(req.file, {
+            where: {
+                id: req.params.id
+            }
+        })
         .then(mem => res.status(200).json(mem))
         .catch(err => res.json(err))
+
+        MemModel.update(req.body, {
+            where: {
+                id: req.params.id
+            }
+        })
+        .then(mem => res.status(200).json(mem))
+        .catch(err => res.json(err))
+    } else {
+        MemModel.update(req.body, {
+            where: {
+                id: req.params.id
+            }
+        })
+        .then(mem => res.status(200).json(mem))
+        .catch(err => res.json(err))
+    }
 })
 
-// get a memory
+// GET A MEMORY BY ID
 router.get('/memory/:id', (req, res) => {
     MemModel.findOne({
         where: {
@@ -54,7 +116,7 @@ router.get('/memory/:id', (req, res) => {
     }))
 })
 
-//get all memories for an individual user
+// GET ALL MEMORIES FOR AN INDIVIDUAL USER
 router.get('/memory', (req, res) => {
     MemModel.findAll({
         where: { owner: req.user.id }

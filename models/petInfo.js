@@ -1,5 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
     const Info = sequelize.define('info', {
+        file: {
+            type: DataTypes.STRING,
+        },
         name: {
             type: DataTypes.STRING,
             allowNull: false

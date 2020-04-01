@@ -1,5 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
     const Memory = sequelize.define('memory', {
+        file: {
+            type: DataTypes.STRING
+        },
         memory: {
             type: DataTypes.STRING
         },

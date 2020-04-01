@@ -4,8 +4,31 @@ const GalleryModel = require('../db').import('../models/photogallery.js');
 
 // upload variables
 const multer = require('multer');
-const fs = require('fs');
-const upload = multer({ dest: '/tmp/'});
+
+// CHANGE FILENAME
+const storage = multer.diskStorage({
+    filename: function(req, file, cb) {
+        cb(null, new Date().toISOString() + file.originalname);
+    }
+});
+
+// NOT ALLOW FILES THAT AREN'T JPEG OR PNG
+const fileFilter = (req, file, cb) => {
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+
+const upload = multer({ 
+    storage: storage,
+    dest: '/tmp/', //SET FOLDER DESTINATION
+    limits: { // SET FILE SIZE LIMIT
+        fileSize: 1024 * 1024 * 6
+    },
+    fileFilter: fileFilter //CALL FILE FILTER
+});
 
 // post an image
 router.post('/image', upload.single('file'), (req, res) => {
